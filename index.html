@@ -143,8 +143,9 @@
         </div>
 
         <!-- Moved download link outside the reportDisplayArea to prevent innerHTML issues -->
-        <div class="text-center mt-6" id="downloadButtonContainer">
-            <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 hidden">
+        <!-- Removed 'hidden' class from HTML, will control display via JS -->
+        <div class="text-center mt-6" id="downloadButtonContainer" style="display: none;">
+            <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5">
                 Download Report as HTML
             </a>
         </div>
@@ -321,6 +322,7 @@
             const resultDiv = document.getElementById('resultDiv');
             const loadingMessage = document.getElementById('loadingMessage');
             const downloadLink = document.getElementById('downloadReportLink'); // Changed to downloadLink
+            const downloadButtonContainer = document.getElementById('downloadButtonContainer'); // Get the container
 
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', async () => {
@@ -339,7 +341,7 @@
                     const genderB = document.getElementById('genderB').value;
 
                     resultDiv.innerHTML = '';
-                    downloadLink.classList.add('hidden'); // Use downloadLink
+                    downloadButtonContainer.style.display = 'none'; // Hide the container
                     loadingMessage.classList.remove('hidden');
                     console.log('UI state reset, loading message shown.'); // DEBUG LOG
 
@@ -395,8 +397,9 @@
                         console.log('resultDiv innerHTML set.'); // DEBUG LOG
                         console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
                         
-                        downloadLink.classList.remove('hidden'); // Use downloadLink
-                        console.log('Report displayed successfully, download link shown.'); // DEBUG LOG
+                        downloadButtonContainer.style.display = 'block'; // Show the container
+                        console.log('Download button container shown.'); // DEBUG LOG
+                        console.log('Download link offsetWidth:', downloadLink.offsetWidth, 'offsetHeight:', downloadLink.offsetHeight); // DEBUG LOG
 
                         // Set up download link functionality using a temporary anchor element
                         downloadLink.onclick = (event) => { // Added event parameter
