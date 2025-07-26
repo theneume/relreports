@@ -135,17 +135,18 @@
             <p class="text-gray-600 mt-3 text-lg">Brewing insights from the cosmos... Please wait.</p>
         </div>
 
-        <div id="reportOutput" class="mt-12 border-t border-gray-200 pt-8">
+        <div id="reportDisplayArea" class="mt-12 border-t border-gray-200 pt-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Your Personalized Relationship Report</h2>
             <div id="resultDiv" class="bg-gray-50 p-8 rounded-lg shadow-inner report-content text-gray-800 leading-relaxed text-justify">
                 <p class="text-center text-gray-500">Enter details for Person A and Person B and click "Generate Report" to unveil their unique Affinity Zone relationship dynamics.</p>
             </div>
-            <div class="text-center mt-6">
-                <!-- Changed from button to anchor tag and styled as a button -->
-                <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 hidden">
-                    Download Report as HTML
-                </a>
-            </div>
+        </div>
+
+        <!-- Moved download link outside the reportDisplayArea to prevent innerHTML issues -->
+        <div class="text-center mt-6" id="downloadButtonContainer">
+            <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 hidden">
+                Download Report as HTML
+            </a>
         </div>
     </div>
 
@@ -321,7 +322,7 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const downloadLink = document.getElementById('downloadReportLink'); // Changed to downloadLink
 
-            // Set the initial text for the download link
+            // Set the initial text for the download link (this is now redundant but harmless)
             if (downloadLink) {
                 downloadLink.textContent = "Download Report as HTML";
             }
@@ -400,6 +401,8 @@
                         console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
                         
                         downloadLink.classList.remove('hidden'); // Use downloadLink
+                        // The text "Download Report as HTML" is now directly in the HTML of the <a> tag
+                        // So, no need to set textContent here.
                         console.log('Report displayed successfully, download link shown.'); // DEBUG LOG
 
                         // Set up download link functionality
