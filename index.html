@@ -320,6 +320,11 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const downloadButton = document.getElementById('downloadReportBtn');
 
+            // Set the initial text for the download button
+            if (downloadButton) {
+                downloadButton.textContent = "Download Report as HTML";
+            }
+
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', async () => {
                     console.log('Generate button clicked.'); // DEBUG LOG
@@ -349,8 +354,6 @@
                         const sortedAffinities = [affinityA, affinityB].sort();
                         let relationshipKey = sortedAffinities.join('-');
                         console.log('Calculated relationship key:', relationshipKey); // DEBUG LOG
-
-                        console.log('Simulated delay removed.'); // DEBUG LOG
 
                         // Fetch report content from the specific HTML file in the 'reports' folder
                         const reportFilePath = `reports/${relationshipKey.toLowerCase()}.html`;
@@ -392,14 +395,18 @@
                             ${processedReportContent}
                         `;
                         resultDiv.innerHTML = finalReportHtmlForDisplay;
+                        console.log('resultDiv innerHTML set.'); // DEBUG LOG
+                        console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
+                        
                         downloadButton.classList.remove('hidden');
                         console.log('Report displayed successfully, download button shown.'); // DEBUG LOG
 
                         // Set up download button functionality
                         downloadButton.onclick = () => {
-                            console.log('Download button clicked.'); // DEBUG LOG
+                            console.log('Download button clicked inside handler.'); // DEBUG LOG
 
                             // Construct the full HTML for download separately
+                            // Using processedReportContent directly as it contains the full report body
                             const downloadReportBodyContent = `
                                 <h1 style="font-size: 2.2em; text-align: center; color: #1a202c; margin-bottom: 0.8em;">AZONE AI Relationship Report for ${nameA} and ${nameB}</h1>
                                 <p style="font-size: 1.8em; text-align: center; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em;">
@@ -408,6 +415,7 @@
                                 </p>
                                 ${processedReportContent}
                             `;
+                            console.log('Download HTML body content prepared.'); // DEBUG LOG
 
                             const downloadHtml = `
                                 <!DOCTYPE html>
@@ -436,18 +444,26 @@
                                 </body>
                                 </html>
                             `;
-                            const blob = new Blob([downloadHtml], { type: 'text/html' });
-                            const a = document.createElement('a');
-                            a.href = URL.createObjectURL(blob);
-                            a.download = `AZONE_Report_${nameA}_${nameB}.html`;
-                            document.body.appendChild(a);
-                            a.click(); // Programmatically click the link to trigger download
-                            document.body.removeChild(a); // Clean up the temporary link
-                            URL.revokeObjectURL(a.href); // Release the object URL
+                            console.log('Full download HTML prepared.'); // DEBUG LOG
+
+                            try {
+                                const blob = new Blob([downloadHtml], { type: 'text/html' });
+                                const a = document.createElement('a');
+                                a.href = URL.createObjectURL(blob);
+                                a.download = `AZONE_Report_${nameA}_${nameB}.html`;
+                                document.body.appendChild(a);
+                                a.click(); // Programmatically click the link to trigger download
+                                document.body.removeChild(a); // Clean up the temporary link
+                                URL.revokeObjectURL(a.href); // Release the object URL
+                                console.log('Download triggered successfully.'); // DEBUG LOG
+                            } catch (downloadError) {
+                                console.error('Error during download process:', downloadError); // DEBUG LOG
+                                // You could display a user-friendly message here if needed
+                            }
                         };
 
                     } catch (error) {
-                        console.error('Error during report generation:', error); // DEBUG LOG
+                        console.error('Error during report generation (caught):', error); // DEBUG LOG
                         resultDiv.innerHTML = `<p class="text-red-500 text-center">Error: ${error.message}</p>`;
                         resultDiv.style.display = 'block';
                     } finally {
