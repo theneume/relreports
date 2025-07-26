@@ -143,9 +143,7 @@
         </div>
 
         <!-- Moved download link outside the reportDisplayArea to prevent innerHTML issues -->
-        <!-- Removed 'hidden' class from HTML, will control display via JS -->
         <div class="text-center mt-6" id="downloadButtonContainer" style="display: none;">
-            <!-- Added !text-white and whitespace-nowrap for explicit styling -->
             <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 !text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 whitespace-nowrap">
                 Download Report as HTML
             </a>
@@ -322,8 +320,11 @@
             const generateReportBtn = document.getElementById('generateReportBtn');
             const resultDiv = document.getElementById('resultDiv');
             const loadingMessage = document.getElementById('loadingMessage');
-            const downloadLink = document.getElementById('downloadReportLink'); // Changed to downloadLink
-            const downloadButtonContainer = document.getElementById('downloadButtonContainer'); // Get the container
+            const downloadLink = document.getElementById('downloadReportLink');
+            const downloadButtonContainer = document.getElementById('downloadButtonContainer');
+
+            // Initial state: hide the download button container
+            downloadButtonContainer.style.display = 'none';
 
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', async () => {
@@ -355,6 +356,22 @@
                         let relationshipKey = sortedAffinities.join('-');
                         console.log('Calculated relationship key:', relationshipKey); // DEBUG LOG
 
+                        // --- Dynamic Polarity Description Logic ---
+                        let personAPolarityDesc = '';
+                        if (genderA === 'male') {
+                            personAPolarityDesc = `you are a "Conventional Man" in energetic terms. This means you likely experience a natural ease in embodying traditional masculine roles—being a bold protector, a decisive provider, or a commanding leader. Your drive and assertiveness probably feel effortless and fundamental to who you are. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. It's not out of malice, but simply because your natural impulse is so strong and direct. Perhaps you’ve had moments where your directness in a conversation came across as rude, when you simply meant to be efficient.`;
+                        } else if (genderA === 'female') {
+                            personAPolarityDesc = `you are an "Unconventional Woman" in terms of energetic expression. While you are biologically female, your neurochemical blueprint predisposes you to powerful, active, and initiating Yang energy, making you a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that your innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. You might find yourself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge your self-esteem, making you question if you are "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely your unique gift, shaping you into a powerful and empowered woman. Think of a time you simply took charge of a situation, and someone reacted with surprise—that’s your natural energy in action.`;
+                        }
+
+                        let personBPolarityDesc = '';
+                        if (genderB === 'male') {
+                            personBPolarityDesc = `he is a "Conventional Man" in energetic terms. This means he naturally embodies a straightforward masculine presence, often gravitating towards leadership, tangible results, or intellectual mastery. His drive and assertiveness probably feel effortless and fundamental to him. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. He might not even realize it, as his natural impulse is so strong and direct. You might find that his confidence, though a powerful asset, can sometimes be perceived by you as overbearing if he's not careful to modulate his intensity. Perhaps you’ve observed him being fiercely direct in a conversation, and while it gets results, it might leave others feeling steamrolled.`;
+                        } else if (genderB === 'female') {
+                            personBPolarityDesc = `she is an "Unconventional Woman" in terms of energetic expression. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that her innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. She might find herself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge her self-esteem, making her question if she is "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely her unique gift, shaping her into a powerful and empowered woman. You might admire her ability to take charge effortlessly, or her fearless pursuit of ambitious goals.`;
+                        }
+                        // --- End Dynamic Polarity Description Logic ---
+
                         // Fetch report content from the specific HTML file in the 'reports' folder
                         const reportFilePath = `reports/${relationshipKey.toLowerCase()}.html`;
                         console.log('Attempting to fetch report from:', reportFilePath); // DEBUG LOG
@@ -367,7 +384,7 @@
                             throw new Error(`Report content not found for ${relationshipKey} (Status: ${response.status}). Please ensure 'reports/${relationshipKey.toLowerCase()}.html' exists and is accessible.`);
                         }
 
-                        const reportContent = await response.text();
+                        let reportContent = await response.text();
                         console.log('Fetched report content length:', reportContent.length); // DEBUG LOG
                         console.log('Fetched report content (first 200 chars):', reportContent.substring(0, 200)); // DEBUG LOG
                         
@@ -377,14 +394,49 @@
                         }
 
                         // Replace placeholders for dynamic data within the fetched insight
-                        let processedReportContent = reportContent
+                        reportContent = reportContent
                             .replace(/PERSON_A_GENDER/g, genderA)
                             .replace(/PERSON_B_GENDER/g, genderB)
                             .replace(/PERSON_A_NAME/g, nameA)
                             .replace(/PERSON_B_NAME/g, nameB)
                             .replace(/AFFINITY_A/g, affinityA)
-                            .replace(/AFFINITY_B/g, affinityB);
-                        console.log('Placeholders processed.'); // DEBUG LOG
+                            .replace(/AFFINITY_B/g, affinityB)
+                            .replace(/PERSON_A_POLARITY_DESC/g, personAPolarityDesc) // New replacement
+                            .replace(/PERSON_B_POLARITY_DESC/g, personBPolarityDesc); // New replacement
+                        console.log('General placeholders and polarity descriptions processed.'); // DEBUG LOG
+
+                        // --- Dynamic Romantic Context Replacement ---
+                        // This logic will remove the irrelevant romantic context paragraphs
+                        // based on the gender combination, leaving only the relevant one.
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = reportContent; // Parse the content as HTML
+
+                        const romanticMaleFemale = tempDiv.querySelector('#romantic-male-female-dd-dd');
+                        const romanticFemaleMale = tempDiv.querySelector('#romantic-female-male-dd-dd');
+                        const romanticMaleMale = tempDiv.querySelector('#romantic-male-male-dd-dd');
+                        const romanticFemaleFemale = tempDiv.querySelector('#romantic-female-female-dd-dd');
+
+                        if (genderA === 'male' && genderB === 'female') {
+                            if (romanticFemaleMale) romanticFemaleMale.remove();
+                            if (romanticMaleMale) romanticMaleMale.remove();
+                            if (romanticFemaleFemale) romanticFemaleFemale.remove();
+                        } else if (genderA === 'female' && genderB === 'male') {
+                            if (romanticMaleFemale) romanticMaleFemale.remove();
+                            if (romanticMaleMale) romanticMaleMale.remove();
+                            if (romanticFemaleFemale) romanticFemaleFemale.remove();
+                        } else if (genderA === 'male' && genderB === 'male') {
+                             if (romanticMaleFemale) romanticMaleFemale.remove();
+                             if (romanticFemaleMale) romanticFemaleMale.remove();
+                             if (romanticFemaleFemale) romanticFemaleFemale.remove();
+                        } else if (genderA === 'female' && genderB === 'female') {
+                             if (romanticMaleFemale) romanticMaleFemale.remove();
+                             if (romanticFemaleMale) romanticFemaleMale.remove();
+                             if (romanticMaleMale) romanticMaleMale.remove();
+                        }
+                        // Re-serialize the HTML after removing elements
+                        processedReportContent = tempDiv.innerHTML;
+                        console.log('Romantic context processed.'); // DEBUG LOG
+
 
                         // The HTML to display in the resultDiv
                         let finalReportHtmlForDisplay = `
