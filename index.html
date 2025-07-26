@@ -18,7 +18,9 @@
             padding: 1rem;
         }
         .report-content {
-            max-height: 80vh; /* Adjust as needed */
+            /* Adjusted for full height, with scrolling if content overflows */
+            max-height: none; /* Allow content to dictate height */
+            height: auto; /* Ensure it adjusts to content */
             overflow-y: auto;
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
@@ -348,7 +350,6 @@
                         let relationshipKey = sortedAffinities.join('-');
                         console.log('Calculated relationship key:', relationshipKey); // DEBUG LOG
 
-                        // Removed simulated delay: await new Promise(resolve => setTimeout(Math.random() * 2000 + 1000, resolve));
                         console.log('Simulated delay removed.'); // DEBUG LOG
 
                         // Fetch report content from the specific HTML file in the 'reports' folder
@@ -382,20 +383,32 @@
                             .replace(/AFFINITY_B/g, affinityB);
                         console.log('Placeholders processed.'); // DEBUG LOG
 
-                        let finalReportHtml = `
+                        // The HTML to display in the resultDiv
+                        let finalReportHtmlForDisplay = `
                             <p class="text-2xl font-semibold mb-6 text-center text-gray-900">
                                 The Sacred Connection Between ${nameA} (${affinityA}) and ${nameB} (${affinityB}):
                                 <br class="hidden md:block"> A Journey into their Unique ${affinityA}-${affinityB} Relationship
                             </p>
                             ${processedReportContent}
                         `;
-                        resultDiv.innerHTML = finalReportHtml;
+                        resultDiv.innerHTML = finalReportHtmlForDisplay;
                         downloadButton.classList.remove('hidden');
                         console.log('Report displayed successfully, download button shown.'); // DEBUG LOG
 
                         // Set up download button functionality
                         downloadButton.onclick = () => {
                             console.log('Download button clicked.'); // DEBUG LOG
+
+                            // Construct the full HTML for download separately
+                            const downloadReportBodyContent = `
+                                <h1 style="font-size: 2.2em; text-align: center; color: #1a202c; margin-bottom: 0.8em;">AZONE AI Relationship Report for ${nameA} and ${nameB}</h1>
+                                <p style="font-size: 1.8em; text-align: center; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em;">
+                                    The Sacred Connection Between ${nameA} (${affinityA}) and ${nameB} (${affinityB}):
+                                    <br> A Journey into their Unique ${affinityA}-${affinityB} Relationship
+                                </p>
+                                ${processedReportContent}
+                            `;
+
                             const downloadHtml = `
                                 <!DOCTYPE html>
                                 <html lang="en">
@@ -419,8 +432,7 @@
                                     </style>
                                 </head>
                                 <body>
-                                    <h1>AZONE AI Relationship Report for ${nameA} and ${nameB}</h1>
-                                    ${finalReportHtml}
+                                    ${downloadReportBodyContent}
                                 </body>
                                 </html>
                             `;
@@ -429,8 +441,9 @@
                             a.href = URL.createObjectURL(blob);
                             a.download = `AZONE_Report_${nameA}_${nameB}.html`;
                             document.body.appendChild(a);
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(a.href);
+                            a.click(); // Programmatically click the link to trigger download
+                            document.body.removeChild(a); // Clean up the temporary link
+                            URL.revokeObjectURL(a.href); // Release the object URL
                         };
 
                     } catch (error) {
