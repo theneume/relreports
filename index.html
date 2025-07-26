@@ -141,9 +141,10 @@
                 <p class="text-center text-gray-500">Enter details for Person A and Person B and click "Generate Report" to unveil their unique Affinity Zone relationship dynamics.</p>
             </div>
             <div class="text-center mt-6">
-                <button id="downloadReportBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 hidden">
+                <!-- Changed from button to anchor tag and styled as a button -->
+                <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 hidden">
                     Download Report as HTML
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -318,11 +319,11 @@
             const generateReportBtn = document.getElementById('generateReportBtn');
             const resultDiv = document.getElementById('resultDiv');
             const loadingMessage = document.getElementById('loadingMessage');
-            const downloadButton = document.getElementById('downloadReportBtn');
+            const downloadLink = document.getElementById('downloadReportLink'); // Changed to downloadLink
 
-            // Set the initial text for the download button (now also set when button is revealed)
-            if (downloadButton) {
-                downloadButton.textContent = "Download Report as HTML";
+            // Set the initial text for the download link
+            if (downloadLink) {
+                downloadLink.textContent = "Download Report as HTML";
             }
 
             if (generateReportBtn) {
@@ -342,7 +343,7 @@
                     const genderB = document.getElementById('genderB').value;
 
                     resultDiv.innerHTML = '';
-                    downloadButton.classList.add('hidden');
+                    downloadLink.classList.add('hidden'); // Use downloadLink
                     loadingMessage.classList.remove('hidden');
                     console.log('UI state reset, loading message shown.'); // DEBUG LOG
 
@@ -398,17 +399,15 @@
                         console.log('resultDiv innerHTML set.'); // DEBUG LOG
                         console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
                         
-                        downloadButton.classList.remove('hidden');
-                        // Ensure text is set AFTER the button is made visible
-                        downloadButton.textContent = "Download Report as HTML"; // Moved this line
-                        console.log('Report displayed successfully, download button shown with text.'); // DEBUG LOG
+                        downloadLink.classList.remove('hidden'); // Use downloadLink
+                        console.log('Report displayed successfully, download link shown.'); // DEBUG LOG
 
-                        // Set up download button functionality
-                        downloadButton.onclick = () => {
-                            console.log('Download button clicked inside handler.'); // DEBUG LOG
+                        // Set up download link functionality
+                        downloadLink.onclick = (event) => { // Added event parameter
+                            event.preventDefault(); // Prevent default link behavior
+                            console.log('Download link clicked inside handler.'); // DEBUG LOG
 
                             // Construct the full HTML for download separately
-                            // Using processedReportContent directly as it contains the full report body
                             const downloadReportBodyContent = `
                                 <h1 style="font-size: 2.2em; text-align: center; color: #1a202c; margin-bottom: 0.8em;">AZONE AI Relationship Report for ${nameA} and ${nameB}</h1>
                                 <p style="font-size: 1.8em; text-align: center; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em;">
@@ -450,13 +449,14 @@
 
                             try {
                                 const blob = new Blob([downloadHtml], { type: 'text/html' });
-                                const a = document.createElement('a');
-                                a.href = URL.createObjectURL(blob);
-                                a.download = `AZONE_Report_${nameA}_${nameB}.html`;
-                                document.body.appendChild(a);
-                                a.click(); // Programmatically click the link to trigger download
-                                document.body.removeChild(a); // Clean up the temporary link
-                                URL.revokeObjectURL(a.href); // Release the object URL
+                                downloadLink.href = URL.createObjectURL(blob); // Set href to the blob URL
+                                downloadLink.download = `AZONE_Report_${nameA}_${nameB}.html`; // Set download attribute
+                                
+                                // Programmatically click the link. This works because the href and download attributes are set.
+                                // No need to append to body and remove, just trigger the click on the element itself.
+                                downloadLink.click(); 
+                                
+                                URL.revokeObjectURL(downloadLink.href); // Release the object URL
                                 console.log('Download triggered successfully.'); // DEBUG LOG
                             } catch (downloadError) {
                                 console.error('Error during download process:', downloadError); // DEBUG LOG
