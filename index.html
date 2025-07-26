@@ -411,42 +411,53 @@
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = reportContent; // Parse the content as HTML
 
-                        const romanticMaleFemale = tempDiv.querySelector('#romantic-male-female-dd-dd');
-                        const romanticFemaleMale = tempDiv.querySelector('#romantic-female-male-dd-dd');
-                        const romanticMaleMale = tempDiv.querySelector('#romantic-male-male-dd-dd');
-                        const romanticFemaleFemale = tempDiv.querySelector('#romantic-female-female-dd-dd');
+                        // Get all potential romantic context paragraphs by their IDs
+                        const romanticMaleFemaleEl = tempDiv.querySelector('#romantic-male-female-dd-dd');
+                        const romanticFemaleMaleEl = tempDiv.querySelector('#romantic-female-male-dd-dd');
+                        const romanticMaleMaleEl = tempDiv.querySelector('#romantic-male-male-dd-dd');
+                        const romanticFemaleFemaleEl = tempDiv.querySelector('#romantic-female-female-dd-dd');
 
-                        // Remove all romantic context paragraphs initially
-                        if (romanticMaleFemale) romanticMaleFemale.remove();
-                        if (romanticFemaleMale) romanticFemaleMale.remove();
-                        if (romanticMaleMale) romanticMaleMale.remove();
-                        if (romanticFemaleFemale) romanticFemaleFemale.remove();
+                        // Remove all of them first
+                        if (romanticMaleFemaleEl) romanticMaleFemaleEl.remove();
+                        if (romanticFemaleMaleEl) romanticFemaleMaleEl.remove();
+                        if (romanticMaleMaleEl) romanticMaleMaleEl.remove();
+                        if (romanticFemaleFemaleEl) romanticFemaleFemaleEl.remove();
 
-                        // Now, append only the relevant one based on gender combination
-                        let relevantRomanticParagraph = null;
+                        // Now, create the specific paragraph content and insert it
+                        let specificRomanticParagraphHtml = '';
                         if (genderA === 'male' && genderB === 'female') {
-                            // Re-create the specific paragraph content for this combination
-                            relevantRomanticParagraph = document.createElement('p');
-                            relevantRomanticParagraph.className = 'mb-2';
-                            relevantRomanticParagraph.innerHTML = `If <b>${nameA}</b> is male and <b>${nameB}</b> is female: You, <b>${nameA}</b>, are likely drawn to <b>${nameB}</b>'s high charge and independence; you respect her strength and drive, finding her exciting and powerful rather than seeking a conventionally "softer" or more traditionally submissive partner. You value her as a strong, capable ally in life's challenges, not because she is like "Betty Crocker." Your shared confidence, <b>${nameA}</b>, though a powerful asset, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. For example, during a passionate discussion about a shared goal, your natural assertiveness might push for an immediate decision, and <b>${nameB}</b> might feel her innovative ideas are being cut short. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if you don't intend it, as your natural impulse is to lead and make things happen. This strong, independent nature in <b>${nameB}</b> is precisely her unique gift, shaping her into a powerful and empowered woman, and your respect for this drive, <b>${nameA}</b>, is a cornerstone of your mutual attraction. This combination can be incredibly formidable in the external world, capable of achieving immense impact. The challenge lies in consciously cultivating moments of vulnerability and stillness, to prevent your shared drive from overshadowing the tender needs of the heart. For instance, you might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.`;
+                            specificRomanticParagraphHtml = `
+                                <p class="mb-2">If <b>${nameA}</b> is male and <b>${nameB}</b> is female: You, <b>${nameA}</b>, are likely drawn to <b>${nameB}</b>'s high charge and independence; you respect her strength and drive, finding her exciting and powerful rather than seeking a conventionally "softer" or more traditionally submissive partner. You value her as a strong, capable ally in life's challenges, not because she is like "Betty Crocker." Your shared confidence, <b>${nameA}</b>, though a powerful asset, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. For example, during a passionate discussion about a shared goal, your natural assertiveness might push for an immediate decision, and <b>${nameB}</b> might feel her innovative ideas are being cut short. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if you don't intend it, as your natural impulse is to lead and make things happen. This strong, independent nature in <b>${nameB}</b> is precisely her unique gift, shaping her into a powerful and empowered woman, and your respect for this drive, <b>${nameA}</b>, is a cornerstone of your mutual attraction. This combination can be incredibly formidable in the external world, capable of achieving immense impact. The challenge lies in consciously cultivating moments of vulnerability and stillness, to prevent your shared drive from overshadowing the tender needs of the heart. For instance, you might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.</p>
+                            `;
                         } else if (genderA === 'female' && genderB === 'male') {
-                            relevantRomanticParagraph = document.createElement('p');
-                            relevantRomanticParagraph.className = 'mb-2';
-                            relevantRomanticParagraph.innerHTML = `If <b>${nameA}</b> is female and <b>${nameB}</b> is male: You, <b>${nameA}</b>, as a female Dynamic Initiator, embody a powerful, active, and initiating Yang energy, making you a true force of nature. You might find <b>${nameB}</b>'s strength and directness incredibly compelling, as he can keep pace with your ambition and drive. <b>${nameB}</b>, in turn, might admire your powerful will and decisive nature. The challenge for you both will be to bridge the gap between your shared assertive energies, ensuring that neither partner dominates the other. You might find that your own confidence, <b>${nameA}</b>, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if he doesn't intend it, as his natural impulse is to lead and make things happen. This pairing has the potential for immense achievement, but requires conscious effort to cultivate mutual yielding and emotional intimacy. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.`;
+                            specificRomanticParagraphHtml = `
+                                <p class="mb-2">If <b>${nameA}</b> is female and <b>${nameB}</b> is male: You, <b>${nameA}</b>, as a female Dynamic Initiator, embody a powerful, active, and initiating Yang energy, making you a true force of nature. You might find <b>${nameB}</b>'s strength and directness incredibly compelling, as he can keep pace with your ambition and drive. <b>${nameB}</b>, in turn, might admire your powerful will and decisive nature. The challenge for you both will be to bridge the gap between your shared assertive energies, ensuring that neither partner dominates the other. You might find that your own confidence, <b>${nameA}</b>, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if he doesn't intend it, as his natural impulse is to lead and make things happen. This pairing has the potential for immense achievement, but requires conscious effort to cultivate mutual yielding and emotional intimacy. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.</p>
+                            `;
                         } else if (genderA === 'male' && genderB === 'male') {
-                            relevantRomanticParagraph = document.createElement('p');
-                            relevantRomanticParagraph.className = 'mb-2';
-                            relevantRomanticParagraph.innerHTML = `If both <b>${nameA}</b> and <b>${nameB}</b> are male: As two male Dynamic Initiators, your relationship is a potent force of shared drive, ambition, and a mutual respect for competence. You both naturally gravitate towards leadership and achieving tangible results. This can lead to incredible productivity and external success. The challenge lies in managing your shared strong wills and competitive natures, ensuring that your drive for impact doesn't overshadow the need for emotional vulnerability and shared stillness. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.`;
+                            specificRomanticParagraphHtml = `
+                                <p class="mb-2">If both <b>${nameA}</b> and <b>${nameB}</b> are male: As two male Dynamic Initiators, your relationship is a potent force of shared drive, ambition, and a mutual respect for competence. You both naturally gravitate towards leadership and achieving tangible results. This can lead to incredible productivity and external success. The challenge lies in managing your shared strong wills and competitive natures, ensuring that your drive for impact doesn't overshadow the need for emotional vulnerability and shared stillness. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.</p>
+                            `;
                         } else if (genderA === 'female' && genderB === 'female') {
-                            relevantRomanticParagraph = document.createElement('p');
-                            relevantRomanticParagraph.className = 'mb-2';
-                            relevantRomanticParagraph.innerHTML = `If both <b>${nameA}</b> and <b>${nameB}</b> are female: As two female Dynamic Initiators, your relationship is a powerful and unconventional pairing, embodying immense drive and a fearless pursuit of ambitious goals. You both possess strong, active Yang energy, which can lead to remarkable achievements and a deep understanding of each other's independent natures. The challenge lies in navigating your shared assertive energies, ensuring that neither partner dominates the other, and consciously cultivating moments of vulnerability and stillness to nurture the emotional depth of your connection. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.`;
+                            specificRomanticParagraphHtml = `
+                                <p class="mb-2">If both <b>${nameA}</b> and <b>${nameB}</b> are female: As two female Dynamic Initiators, your relationship is a powerful and unconventional pairing, embodying immense drive and a fearless pursuit of ambitious goals. You both possess strong, active Yang energy, which can lead to remarkable achievements and a deep understanding of each other's independent natures. The challenge lies in navigating your shared assertive energies, ensuring that neither partner dominates the other, and consciously cultivating moments of vulnerability and stillness to nurture the emotional depth of your connection. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.`;
                         }
 
                         // Find the "Romantic Relationships" heading and insert the relevant paragraph after it
-                        const romanticHeading = tempDiv.querySelector('h4:contains("Romantic Relationships")'); // This selector might need adjustment
-                        if (romanticHeading && relevantRomanticParagraph) {
-                            romanticHeading.parentNode.insertBefore(relevantRomanticParagraph, romanticHeading.nextSibling);
+                        // Use querySelectorAll and loop to find the correct heading
+                        const allH4s = tempDiv.querySelectorAll('h4');
+                        let romanticHeading = null;
+                        for (const h4 of allH4s) {
+                            if (h4.textContent.includes('Romantic Relationships')) {
+                                romanticHeading = h4;
+                                break;
+                            }
+                        }
+
+                        if (romanticHeading && specificRomanticParagraphHtml) {
+                            const newParagraph = document.createElement('div'); // Use a div to hold the HTML content
+                            newParagraph.innerHTML = specificRomanticParagraphHtml;
+                            // Insert the new paragraph after the romantic heading
+                            romanticHeading.parentNode.insertBefore(newParagraph, romanticHeading.nextSibling);
                         }
                         
                         processedReportContent = tempDiv.innerHTML; // Re-serialize the HTML after modifications
