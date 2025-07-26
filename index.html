@@ -322,11 +322,6 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const downloadLink = document.getElementById('downloadReportLink'); // Changed to downloadLink
 
-            // Set the initial text for the download link (this is now redundant but harmless)
-            if (downloadLink) {
-                downloadLink.textContent = "Download Report as HTML";
-            }
-
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', async () => {
                     console.log('Generate button clicked.'); // DEBUG LOG
@@ -401,11 +396,9 @@
                         console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
                         
                         downloadLink.classList.remove('hidden'); // Use downloadLink
-                        // The text "Download Report as HTML" is now directly in the HTML of the <a> tag
-                        // So, no need to set textContent here.
                         console.log('Report displayed successfully, download link shown.'); // DEBUG LOG
 
-                        // Set up download link functionality
+                        // Set up download link functionality using a temporary anchor element
                         downloadLink.onclick = (event) => { // Added event parameter
                             event.preventDefault(); // Prevent default link behavior
                             console.log('Download link clicked inside handler.'); // DEBUG LOG
@@ -452,15 +445,17 @@
 
                             try {
                                 const blob = new Blob([downloadHtml], { type: 'text/html' });
-                                downloadLink.href = URL.createObjectURL(blob); // Set href to the blob URL
-                                downloadLink.download = `AZONE_Report_${nameA}_${nameB}.html`; // Set download attribute
+                                const tempUrl = URL.createObjectURL(blob); // Create temporary URL
                                 
-                                // Programmatically click the link. This works because the href and download attributes are set.
-                                // No need to append to body and remove, just trigger the click on the element itself.
-                                downloadLink.click(); 
-                                
-                                URL.revokeObjectURL(downloadLink.href); // Release the object URL
-                                console.log('Download triggered successfully.'); // DEBUG LOG
+                                const tempLink = document.createElement('a'); // Create a temporary link element
+                                tempLink.href = tempUrl;
+                                tempLink.download = `AZONE_Report_${nameA}_${nameB}.html`;
+                                tempLink.style.display = 'none'; // Hide it
+                                document.body.appendChild(tempLink); // Append to body
+                                tempLink.click(); // Programmatically click
+                                document.body.removeChild(tempLink); // Clean up
+                                URL.revokeObjectURL(tempUrl); // Revoke URL
+                                console.log('Download triggered successfully using temporary link.'); // DEBUG LOG
                             } catch (downloadError) {
                                 console.error('Error during download process:', downloadError); // DEBUG LOG
                                 // You could display a user-friendly message here if needed
