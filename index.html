@@ -320,6 +320,8 @@
 
             if (generateReportBtn) {
                 generateReportBtn.addEventListener('click', async () => {
+                    console.log('Generate button clicked.'); // DEBUG LOG
+
                     const nameA = document.getElementById('nameA').value.trim();
                     const dayA = parseInt(document.getElementById('dayA').value);
                     const monthA = parseInt(document.getElementById('monthA').value);
@@ -335,6 +337,7 @@
                     resultDiv.innerHTML = '';
                     downloadButton.classList.add('hidden');
                     loadingMessage.classList.remove('hidden');
+                    console.log('UI state reset, loading message shown.'); // DEBUG LOG
 
                     try {
                         const affinityA = calculateNatalAffinityZone(dayA, monthA, yearA, genderA);
@@ -346,7 +349,9 @@
                         console.log('Calculated relationship key:', relationshipKey); // DEBUG LOG
 
                         // Simulate API call delay for demonstration (1-3 seconds)
+                        console.log('Starting simulated delay...'); // DEBUG LOG
                         await new Promise(resolve => setTimeout(Math.random() * 2000 + 1000, resolve));
+                        console.log('Simulated delay finished.'); // DEBUG LOG
 
                         // Fetch report content from the specific HTML file in the 'reports' folder
                         const reportFilePath = `reports/${relationshipKey.toLowerCase()}.html`;
@@ -355,17 +360,18 @@
                         console.log('Fetch response status:', response.status); // DEBUG LOG
                         console.log('Fetch response OK:', response.ok); // DEBUG LOG
 
-
                         if (!response.ok) {
-                            // If a specific report file isn't found, you could conceptually fall back to LLM generation here
-                            // For this prototype, we'll just show an error.
-                            throw new Error(`Report content not found for ${relationshipKey}. Please ensure 'reports/${relationshipKey.toLowerCase()}.html' exists.`);
+                            console.error('Fetch was not OK. Response status:', response.status); // DEBUG LOG
+                            throw new Error(`Report content not found for ${relationshipKey} (Status: ${response.status}). Please ensure 'reports/${relationshipKey.toLowerCase()}.html' exists and is accessible.`);
                         }
 
                         const reportContent = await response.text();
+                        console.log('Fetched report content length:', reportContent.length); // DEBUG LOG
                         console.log('Fetched report content (first 200 chars):', reportContent.substring(0, 200)); // DEBUG LOG
-                        if (reportContent.trim().length === 0) {
-                            throw new Error(`Report file for ${relationshipKey} is empty or contains no visible content.`);
+                        
+                        if (reportContent.trim().length === 0 || reportContent.includes('<!DOCTYPE html>')) { // Check for empty or full HTML
+                            console.error('Report file content is empty or contains full HTML structure:', reportContent.substring(0, 50)); // DEBUG LOG
+                            throw new Error(`Report file for ${relationshipKey} is empty or contains unexpected full HTML structure. Ensure it only contains the report section.`);
                         }
 
                         // Replace placeholders for dynamic data within the fetched insight
@@ -376,6 +382,7 @@
                             .replace(/PERSON_B_NAME/g, nameB)
                             .replace(/AFFINITY_A/g, affinityA)
                             .replace(/AFFINITY_B/g, affinityB);
+                        console.log('Placeholders processed.'); // DEBUG LOG
 
                         let finalReportHtml = `
                             <p class="text-2xl font-semibold mb-6 text-center text-gray-900">
@@ -386,10 +393,11 @@
                         `;
                         resultDiv.innerHTML = finalReportHtml;
                         downloadButton.classList.remove('hidden');
-                        console.log('Report displayed successfully.'); // DEBUG LOG
+                        console.log('Report displayed successfully, download button shown.'); // DEBUG LOG
 
                         // Set up download button functionality
                         downloadButton.onclick = () => {
+                            console.log('Download button clicked.'); // DEBUG LOG
                             const downloadHtml = `
                                 <!DOCTYPE html>
                                 <html lang="en">
@@ -433,6 +441,7 @@
                         resultDiv.style.display = 'block';
                     } finally {
                         loadingMessage.classList.add('hidden');
+                        console.log('Loading message hidden.'); // DEBUG LOG
                     }
                 });
             }
