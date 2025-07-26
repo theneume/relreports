@@ -320,7 +320,7 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const downloadButton = document.getElementById('downloadReportBtn');
 
-            // Set the initial text for the download button
+            // Set the initial text for the download button (now also set when button is revealed)
             if (downloadButton) {
                 downloadButton.textContent = "Download Report as HTML";
             }
@@ -399,7 +399,9 @@
                         console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
                         
                         downloadButton.classList.remove('hidden');
-                        console.log('Report displayed successfully, download button shown.'); // DEBUG LOG
+                        // Ensure text is set AFTER the button is made visible
+                        downloadButton.textContent = "Download Report as HTML"; // Moved this line
+                        console.log('Report displayed successfully, download button shown with text.'); // DEBUG LOG
 
                         // Set up download button functionality
                         downloadButton.onclick = () => {
