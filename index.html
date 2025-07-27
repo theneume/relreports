@@ -21,7 +21,7 @@
         .form-section { background-color: #f0f4f8; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 500; color: #4a5568; }
-        input[type="text"], select {
+        input[type="text"], input[type="date"], select { /* Added input[type="date"] here */
             width: 100%;
             padding: 12px;
             border: 1px solid #cbd5e0;
@@ -31,7 +31,7 @@
             box-sizing: border-box;
             transition: border-color 0.2s;
         }
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus, input[type="date"]:focus, select:focus { /* Added input[type="date"] here */
             border-color: #63b3ed;
             outline: none;
         }
@@ -47,6 +47,7 @@
             width: 100%;
             border: none;
             box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+            margin-top: 10px; /* Added margin for spacing between buttons */
         }
         button:hover {
             background-color: #3182ce;
@@ -75,8 +76,8 @@
                 <input type="text" id="personAName" value="John">
             </div>
             <div class="form-group">
-                <label for="personADOB">Person A Date of Birth (YYYY-MM-DD):</label>
-                <input type="text" id="personADOB" placeholder="e.g., 1990-01-01">
+                <label for="personADOB">Person A Date of Birth:</label>
+                <input type="date" id="personADOB"> <!-- Changed type to date, removed placeholder -->
             </div>
             <div class="form-group">
                 <label for="personAGender">Person A Gender:</label>
@@ -91,8 +92,8 @@
                 <input type="text" id="personBName" value="Mary">
             </div>
             <div class="form-group">
-                <label for="personBDOB">Person B Date of Birth (YYYY-MM-DD):</label>
-                <input type="text" id="personBDOB" placeholder="e.g., 1991-03-01">
+                <label for="personBDOB">Person B Date of Birth:</label>
+                <input type="date" id="personBDOB"> <!-- Changed type to date, removed placeholder -->
             </div>
             <div class="form-group">
                 <label for="personBGender">Person B Gender:</label>
@@ -103,6 +104,7 @@
             </div>
 
             <button onclick="generateReport()">Generate Report</button>
+            <button onclick="downloadReport()" id="downloadBtn" class="hidden">Download Report</button> <!-- Download button, hidden initially -->
         </div>
 
         <div id="reportOutput" class="report-output">
@@ -115,16 +117,18 @@
         // In a real application, this would be a more complex calculation
         // For demonstration, we'll hardcode some values or use simple logic
         function calculateAffinityZone(dob) {
-            // Basic validation for YYYY-MM-DD format
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
-                console.error("Invalid DOB format. Please use YYYY-MM-DD.");
-                return "Unknown"; // Or handle error appropriately
+            // When input type is "date", the browser handles validation and provides a valid YYYY-MM-DD string
+            // We still check for empty string or invalid date object just in case.
+            if (!dob) {
+                console.error("Date of Birth cannot be empty.");
+                return "Unknown";
             }
-            const year = new Date(dob).getFullYear();
-            if (isNaN(year)) { // Check if date parsing resulted in a valid number
+            const date = new Date(dob);
+            if (isNaN(date.getFullYear())) {
                 console.error("Could not parse DOB into a valid date.");
                 return "Unknown";
             }
+            const year = date.getFullYear();
             if (year % 2 === 0) { // Example: Even year for DD
                 return "DD";
             } else { // Example: Odd year for DS
@@ -135,6 +139,7 @@
         async function generateReport() {
             // Clear previous report content
             document.getElementById('reportOutput').innerHTML = '';
+            document.getElementById('downloadBtn').classList.add('hidden'); // Hide download button until report is generated
 
             const personAName = document.getElementById('personAName').value;
             const personADOB = document.getElementById('personADOB').value;
@@ -148,7 +153,7 @@
             const affinityB = calculateAffinityZone(personBDOB);
 
             if (affinityA === "Unknown" || affinityB === "Unknown") {
-                document.getElementById('reportOutput').innerHTML = `<p class="text-red-500">Please enter valid dates of birth in YYYY-MM-DD format.</p>`;
+                document.getElementById('reportOutput').innerHTML = `<p class="text-red-500">Please enter valid dates of birth.</p>`;
                 return;
             }
 
@@ -206,6 +211,8 @@
 
 
                 document.getElementById('reportOutput').innerHTML = reportContent;
+                document.getElementById('downloadBtn').classList.remove('hidden'); // Show download button
+
 
                 // --- DYNAMIC HIDING LOGIC FOR ROMANTIC RELATIONSHIPS ---
                 const currentReportType = `${affinityA.toLowerCase()}-${affinityB.toLowerCase()}`;
@@ -234,17 +241,26 @@
             } catch (error) {
                 console.error("Error loading report:", error);
                 document.getElementById('reportOutput').innerHTML = `<p class="text-red-500">Error loading report: ${error.message}. This usually means the report file (${reportPath}) is not found or the path is incorrect. Please ensure 'reports/${reportFileName}' exists in your GitHub repository's root folder and is correctly named (e.g., all lowercase for folder and file names).</p>`;
+                document.getElementById('downloadBtn').classList.add('hidden'); // Hide download button on error
             }
         }
 
-        // Initial report generation on load (optional, useful for testing)
-        // Removed initial call to generateReport() to prevent pre-generation
-        // window.onload = () => {
-        //      // Set default dates to ensure a DD-DS combination for initial load testing
-        //     document.getElementById('personADOB').value = '1990-02-01'; // Example for DD (even year)
-        //     document.getElementById('personBDOB').value = '1991-03-01'; // Example for DS (odd year)
-        //     generateReport();
-        // };
+        function downloadReport() {
+            const reportContent = document.getElementById('reportOutput').innerHTML;
+            const personAName = document.getElementById('personAName').value;
+            const personBName = document.getElementById('personBName').value;
+            const filename = `AZONE_Report_${personAName}_${personBName}.html`;
+
+            const blob = new Blob([reportContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
