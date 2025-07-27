@@ -4,556 +4,229 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZONE AI Relationship Report Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles based on your previous headers/footers */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #4c1d95, #3700b3);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
+        body { font-family: 'Inter', sans-serif; line-height: 1.8; color: #333; background-color: #f9fafb; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 25px; }
+        .container { max-width: 850px; width: 100%; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 40px; margin-top: 20px; margin-bottom: 20px; }
+        h1 { font-size: 2.5em; text-align: center; color: #1a202c; margin-bottom: 0.8em; font-weight: 700; }
+        h2 { font-size: 2em; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em; font-weight: 600; }
+        h3 { font-size: 1.75em; color: #2d3748; margin-top: 1.2em; margin-bottom: 0.6em; font-weight: 600; }
+        h4 { font-size: 1.4em; color: #4a5568; margin-top: 1em; margin-bottom: 0.5em; font-weight: 500; }
+        p { margin-bottom: 1em; }
+        ul { list-style-type: disc; margin-left: 25px; margin-bottom: 1em; }
+        ol { list-style-type: decimal; margin-left: 25px; margin-bottom: 1em; }
+        li { margin-bottom: 0.5em; }
+        b, strong { font-weight: 600; color: #2c3e50; }
+        .form-section { background-color: #f0f4f8; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #4a5568; }
+        input[type="text"], input[type="date"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #2d3748;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
         }
-        .report-content {
-            /* Adjusted for full height, with scrolling if content overflows */
-            max-height: none; /* Allow content to dictate height */
-            height: auto; /* Ensure it adjusts to content */
-            overflow-y: auto;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        input[type="text"]:focus, input[type="date"]:focus, select:focus {
+            border-color: #63b3ed;
+            outline: none;
         }
-        .report-content::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+        button {
+            background-color: #4299e1;
+            color: white;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+            border: none;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
         }
-        /* Loading spinner */
-        .loader {
-            border: 4px solid #e0e7ff; /* Light blue-gray */
-            border-top: 4px solid #4f46e5; /* Indigo-600 */
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
+        button:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        button:active {
+            transform: translateY(0);
         }
-        /* Tailwind overrides/additions for consistent look */
-        .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
-        .from-purple-800 { --tw-gradient-from: #581c87; --tw-gradient-to: rgba(88, 28, 135, 0); }
-        .to-indigo-900 { --tw-gradient-to: #312e81; }
-        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-        .hover\:shadow-3xl:hover { box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3); }
-        .transform { transform: var(--tw-transform); }
-        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-        .hover\:-translate-y-1:hover { --tw-translate-y: -0.25rem; }
-        .rounded-xl { border-radius: 0.75rem; }
-        .rounded-full { border-radius: 9999px; }
-        .report-section {
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 1.5em;
-            margin-bottom: 1.5em;
+        .report-output {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
         }
-        .report-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+        .report-section { border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5em; margin-bottom: 1.5em; }
+        .report-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+        .hidden { display: none; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-800 to-indigo-900 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-4xl w-full transform transition-all duration-300 hover:shadow-3xl">
-        <h1 class="text-4xl font-bold text-center text-gray-900 mb-8 tracking-tight">AZONE AI Relationship Report</h1>
+<body>
+    <div class="container">
+        <h1>AZONE AI Relationship Report Generator</h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-            <div class="bg-indigo-50 p-6 rounded-lg shadow-inner">
-                <h2 class="text-2xl font-semibold text-indigo-800 mb-5">Person A Details</h2>
-                <div class="mb-4">
-                    <label for="nameA" class="block text-indigo-700 text-sm font-medium mb-2">Name:</label>
-                    <input type="text" id="nameA" class="shadow-sm appearance-none border border-indigo-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out" value="John">
-                </div>
-                <div class="mb-4">
-                    <label for="dayA" class="block text-indigo-700 text-sm font-medium mb-2">Day of Birth:</label>
-                    <input type="number" id="dayA" class="shadow-sm appearance-none border border-indigo-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out" min="1" max="31" value="15">
-                </div>
-                <div class="mb-4">
-                    <label for="monthA" class="block text-indigo-700 text-sm font-medium mb-2">Month of Birth:</label>
-                    <select id="monthA" class="shadow-sm appearance-none border border-indigo-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out"></select>
-                </div>
-                <div class="mb-4">
-                    <label for="yearA" class="block text-indigo-700 text-sm font-medium mb-2">Year of Birth:</label>
-                    <select id="yearA" class="shadow-sm appearance-none border border-indigo-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out"></select>
-                </div>
-                <div class="mb-4">
-                    <label for="genderA" class="block text-indigo-700 text-sm font-medium mb-2">Gender:</label>
-                    <select id="genderA" class="shadow-sm appearance-none border border-indigo-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
+        <div class="form-section">
+            <div class="form-group">
+                <label for="personAName">Person A Name:</label>
+                <input type="text" id="personAName" value="John">
+            </div>
+            <div class="form-group">
+                <label for="personADOB">Person A Date of Birth:</label>
+                <input type="date" id="personADOB" value="1990-01-01">
+            </div>
+            <div class="form-group">
+                <label for="personAGender">Person A Gender:</label>
+                <select id="personAGender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
             </div>
 
-            <div class="bg-blue-50 p-6 rounded-lg shadow-inner">
-                <h2 class="text-2xl font-semibold text-blue-800 mb-5">Person B Details</h2>
-                <div class="mb-4">
-                    <label for="nameB" class="block text-blue-700 text-sm font-medium mb-2">Name:</label>
-                    <input type="text" id="nameB" class="shadow-sm appearance-none border border-blue-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" value="Mary">
-                </div>
-                <div class="mb-4">
-                    <label for="dayB" class="block text-blue-700 text-sm font-medium mb-2">Day of Birth:</label>
-                    <input type="number" id="dayB" class="shadow-sm appearance-none border border-blue-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out" min="1" max="31" value="20">
-                </div>
-                <div class="mb-4">
-                    <label for="monthB" class="block text-blue-700 text-sm font-medium mb-2">Month of Birth:</label>
-                    <select id="monthB" class="shadow-sm appearance-none border border-blue-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"></select>
-                </div>
-                <div class="mb-4">
-                    <label for="yearB" class="block text-blue-700 text-sm font-medium mb-2">Year of Birth:</label>
-                    <select id="yearB" class="shadow-sm appearance-none border border-blue-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"></select>
-                </div>
-                <div class="mb-4">
-                    <label for="genderB" class="block text-blue-700 text-sm font-medium mb-2">Gender:</label>
-                    <select id="genderB" class="shadow-sm appearance-none border border-blue-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out">
-                        <option value="female">Female</option>
-                        <option value="male">Male</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="personBName">Person B Name:</label>
+                <input type="text" id="personBName" value="Mary">
             </div>
-        </div>
-
-        <div class="text-center mt-8">
-            <button id="generateReportBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-1">
-                Generate Relationship Report
-            </button>
-        </div>
-
-        <div id="loadingMessage" class="text-center mt-10 hidden">
-            <div class="loader mx-auto"></div>
-            <p class="text-gray-600 mt-3 text-lg">Brewing insights from the cosmos... Please wait.</p>
-        </div>
-
-        <div id="reportDisplayArea" class="mt-12 border-t border-gray-200 pt-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Your Personalized Relationship Report</h2>
-            <div id="resultDiv" class="bg-gray-50 p-8 rounded-lg shadow-inner report-content text-gray-800 leading-relaxed text-justify">
-                <p class="text-center text-gray-500">Enter details for Person A and Person B and click "Generate Report" to unveil their unique Affinity Zone relationship dynamics.</p>
+            <div class="form-group">
+                <label for="personBDOB">Person B Date of Birth:</label>
+                <input type="date" id="personBDOB" value="1991-03-01">
             </div>
+            <div class="form-group">
+                <label for="personBGender">Person B Gender:</label>
+                <select id="personBGender">
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                </select>
+            </div>
+
+            <button onclick="generateReport()">Generate Report</button>
         </div>
 
-        <!-- Moved download link outside the reportDisplayArea to prevent innerHTML issues -->
-        <div class="text-center mt-6" id="downloadButtonContainer" style="display: none;">
-            <a id="downloadReportLink" href="#" class="bg-teal-600 hover:bg-teal-700 !text-white font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition duration-300 ease-in-out transform hover:-translate-y-0.5 whitespace-nowrap">
-                Download Report as HTML
-            </a>
+        <div id="reportOutput" class="report-output">
+            <!-- Report content will be loaded here -->
         </div>
     </div>
 
     <script>
-        // --- Affinity Zones Calculation Functions ---
-        function populateDateDropdowns() {
-            const months = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-            const monthSelects = document.querySelectorAll('select[id^="month"]');
-            monthSelects.forEach(select => {
-                months.forEach((month, index) => {
-                    const option = document.createElement('option');
-                    option.value = index + 1;
-                    option.textContent = month;
-                    select.appendChild(option);
-                });
-            });
+        // Placeholder for Affinity Zone calculation logic
+        // In a real application, this would be a more complex calculation
+        // For demonstration, we'll hardcode some values or use simple logic
+        function calculateAffinityZone(dob) {
+            const year = new Date(dob).getFullYear();
+            if (year % 2 === 0) { // Example: Even year for DD
+                return "DD";
+            } else { // Example: Odd year for DS
+                return "DS";
+            }
+        }
 
-            const currentYear = new Date().getFullYear();
-            const startYear = 1919;
-            const endYear = 2030;
-            const yearSelects = document.querySelectorAll('select[id^="year"]');
-            yearSelects.forEach(select => {
-                for (let year = endYear; year >= startYear; year--) {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    select.appendChild(option);
+        async function generateReport() {
+            const personAName = document.getElementById('personAName').value;
+            const personADOB = document.getElementById('personADOB').value;
+            const personAGender = document.getElementById('personAGender').value;
+
+            const personBName = document.getElementById('personBName').value;
+            const personBDOB = document.getElementById('personBDOB').value;
+            const personBGender = document.getElementById('personBGender').value;
+
+            const affinityA = calculateAffinityZone(personADOB);
+            const affinityB = calculateAffinityZone(personBDOB);
+
+            // Determine the canonical file name (alphabetically sorted)
+            const sortedAffinityZones = [affinityA, affinityB].sort();
+            const reportFileName = `${sortedAffinityZones[0].toLowerCase()}-${sortedAffinityZones[1].toLowerCase()}.html`;
+            
+            // Construct a root-relative URL for robustness
+            const reportPath = `/reports/${reportFileName}`;
+
+            console.log("Attempting to fetch report from:", reportPath);
+
+            try {
+                const response = await fetch(reportPath);
+                if (!response.ok) {
+                    throw new Error(`Report file not found or inaccessible: ${reportPath} (Status: ${response.status})`);
                 }
-            });
+                let reportContent = await response.text();
 
-            // Set default values for initial demonstration
-            if (document.getElementById('monthA')) document.getElementById('monthA').value = 7;
-            if (document.getElementById('yearA')) document.getElementById('yearA').value = 1990;
-            if (document.getElementById('monthB')) document.getElementById('monthB').value = 3;
-            if (document.getElementById('yearB')) document.getElementById('yearB').value = 1992;
-        }
+                // Replace placeholders
+                reportContent = reportContent.replace(/PERSON_A_NAME/g, personAName);
+                reportContent = reportContent.replace(/PERSON_B_NAME/g, personBName);
+                reportContent = reportContent.replace(/PERSON_A_GENDER/g, personAGender);
+                reportContent = reportContent.replace(/PERSON_B_GENDER/g, personBGender);
+                reportContent = reportContent.replace(/AFFINITY_A/g, affinityA);
+                reportContent = reportContent.replace(/AFFINITY_B/g, affinityB);
 
-        // Ensure dropdowns are populated after the DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', populateDateDropdowns);
-
-
-        function getYearOrder(year) {
-            const years = {};
-            let yearOrderCounter = 1;
-            for (let y = 1919; y <= 2030; y++) {
-                years[y] = yearOrderCounter;
-                if (yearOrderCounter === 9) {
-                    yearOrderCounter = 0;
+                // Dynamic Polarity Description (PERSON_A_POLARITY_DESC, PERSON_B_POLARITY_DESC)
+                let polarityADesc = "";
+                if (affinityA === "DD") {
+                    polarityADesc = personAGender === "male" ?
+                        `his inherent energetic expression aligns with the archetypal Yang. This means he likely experiences a natural ease in embodying traditional masculine roles—being a bold protector, a decisive provider, or a commanding leader. His drive and assertiveness probably feel effortless and fundamental to who he is. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. It's not out of malice, but simply because his natural impulse is so strong and direct. Perhaps you’ve had moments where his directness in a conversation came across as rude, when he simply meant to be efficient.` :
+                        `her inherent energetic expression aligns with the archetypal Yang. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that her innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. She might find herself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge her self-esteem, making her question if she is "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely her unique gift, shaping her into a powerful and empowered woman. You might admire her ability to take charge effortlessly, or her fearless pursuit of ambitious goals.`;
+                } else if (affinityA === "DS") {
+                    polarityADesc = personAGender === "male" ?
+                        `his inherent energetic expression aligns with a dynamic interplay of Yang and Yin. He is often intellectually curious, charismatic, and driven by a desire for mastery, but also possesses a contemplative depth. His masculine expression may be more refined, relying on intellectual depth and charm rather than overt physical assertion. He is capable of embodying a softer, more receptive side, but it often comes out in ways that are unique to his high-drive nature.` :
+                        `her inherent energetic expression aligns with a dynamic interplay of Yang and Yin. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. The presence of serotonin provides a nuanced balance, manifesting as a "softer femininity" that emerges after initial strong dopamine bursts. Her femininity, while present, may not always manifest in traditionally soft or nurturing ways, but rather through intellectual stimulation, playful flirting, engaging in games, and embracing challenges with a captivating charm. She is capable of embodying this softer, more receptive side, but it often comes out in ways that are unique to her high-drive nature. This can lead to an ambiguous connection to her gender; she is sure she possesses her inherent femininity, but her high drive sometimes makes her self-image somewhat different to a traditional woman.`;
                 }
-                yearOrderCounter += 1;
-            }
-            return years.hasOwnProperty(year) ? years[year] : -1;
-        }
+                // Add more conditions for SS, SD if needed
 
-        function getMonthRow(day, month, year) {
-            const tableRanges = [
-                { "row": 0, "from": { month: 1, day: 1 }, "to": { month: 1, day: 5 } },
-                { "row": 1, "from": { month: 1, day: 6 }, "to": { month: 2, day: 3 } },
-                { "row": 2, "from": { month: 2, day: 4 }, "to": { month: 3, day: 5 } },
-                { "row": 3, "from": { month: 3, day: 6 }, "to": { month: 4, day: 4 } },
-                { "row": 4, "from": { month: 4, day: 5 }, "to": { month: 5, day: 5 } },
-                { "row": 5, "from": { month: 5, day: 6 }, "to": { month: 6, day: 5 } },
-                { "row": 6, "from": { month: 6, day: 6 }, "to": { month: 7, day: 7 } },
-                { "row": 7, "from": { month: 7, day: 8 }, "to": { month: 8, day: 7 } },
-                { "row": 8, "from": { month: 8, day: 8 }, "to": { month: 9, day: 7 } },
-                { "row": 9, "from": { month: 9, day: 8 }, "to": { month: 10, day: 8 } },
-                { "row": 10, "from": { month: 10, day: 9 }, "to": { month: 11, day: 7 } },
-                { "row": 11, "from": { month: 11, day: 8 }, "to": { month: 12, day: 7 } },
-                { "row": 12, "from": { month: 12, day: 8 }, "to": { month: 12, day: 31 } }
-            ];
-
-            const userDate = new Date(year, month - 1, day);
-
-            for (const item of tableRanges) {
-                const fromMonth = item.from.month;
-                const fromDay = item.from.day;
-                const toMonth = item.to.month;
-                const toDay = item.to.day;
-
-                const dateFrom = new Date(year, fromMonth - 1, fromDay);
-                const dateTo = new Date(year, toMonth - 1, toDay);
-
-                if (item.row === 0) { // This is the Jan 1-5 special case
-                    if (userDate >= dateFrom && userDate <= dateTo) {
-                        return 12; // Maps to "month 12" in male/female tables
-                    }
-                } else { // Standard rows
-                    if (userDate >= dateFrom && userDate <= dateTo) {
-                        return item.row; // Returns 1-12
-                    }
+                let polarityBDesc = "";
+                if (affinityB === "DD") {
+                    polarityBDesc = personBGender === "male" ?
+                        `his inherent energetic expression aligns with the archetypal Yang. This means he naturally embodies a straightforward masculine presence, often gravitating towards leadership, tangible results, or intellectual mastery. His drive and assertiveness probably feel effortless and fundamental to him. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. He might not even realize it, as his natural impulse is so strong and direct. You might find that his confidence, though a powerful asset, can sometimes be perceived by you as overbearing if he's not careful to modulate his intensity. Perhaps you’ve observed him being fiercely direct in a conversation, and while it gets results, it might leave others feeling steamrolled.` :
+                        `her inherent energetic expression aligns with the archetypal Yang. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that her innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. She might find herself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge her self-esteem, making her question if she is "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely her unique gift, shaping her into a powerful and empowered woman. You might admire her ability to take charge effortlessly, or her fearless pursuit of ambitious goals.`;
+                } else if (affinityB === "DS") {
+                    polarityBDesc = personBGender === "male" ?
+                        `his inherent energetic expression aligns with a dynamic interplay of Yang and Yin. He is often intellectually curious, charismatic, and driven by a desire for mastery, but also possesses a contemplative depth. His masculine expression may be more refined, relying on intellectual depth and charm rather than overt physical assertion. He is capable of embodying a softer, more receptive side, but it often comes out in ways that are unique to his high-drive nature.` :
+                        `her inherent energetic expression aligns with a dynamic interplay of Yang and Yin. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. The presence of serotonin provides a nuanced balance, manifesting as a "softer femininity" that emerges after initial strong dopamine bursts. Her femininity, while present, may not always manifest in traditionally soft or nurturing ways, but rather through intellectual stimulation, playful flirting, engaging in games, and embracing challenges with a captivating charm. She is capable of embodying this softer, more receptive side, but it often comes out in ways that are unique to her high-drive nature. This can lead to an ambiguous connection to her gender; she is sure she possesses her inherent femininity, but her high drive sometimes makes her self-image somewhat different to a traditional woman.`;
                 }
-            }
-            return -1; // Date not found in any range (shouldn't happen with full date range)
-        }
+                // Add more conditions for SS, SD if needed
 
-        function calculateNatalAffinityZone(day, month, year, gender) {
-            if (isNaN(day) || isNaN(month) || isNaN(year) || !(month >= 1 && month <= 12 && day >= 1 && day <= 31)) {
-                throw new Error("Invalid month or day. Please ensure all fields are selected and valid numbers.");
-            }
-            if (!(year >= 1919 && year <= 2030)) {
-                throw new Error("Year out of supported range (1919-2030).");
-            }
-            if (gender !== "male" && gender !== "female") {
-                throw new Error("Gender must be 'male' or 'female'.");
-            }
+                reportContent = reportContent.replace(/PERSON_A_POLARITY_DESC/g, polarityADesc);
+                reportContent = reportContent.replace(/PERSON_B_POLARITY_DESC/g, polarityBDesc);
 
-            const maleLookup = {
-                1: { "1": "G", "2": "A", "3": "D", "4": "A", "5": "A", "6": "D", "7": "A", "8": "G", "9": "B" },
-                2: { "1": "G", "2": "B", "3": "G", "4": "A", "5": "B", "6": "G", "7": "A", "8": "D", "9": "A" },
-                3: { "1": "D", "2": "A", "3": "D", "4": "B", "5": "A", "6": "D", "7": "B", "8": "G", "9": "B" },
-                4: { "1": "G", "2": "B", "3": "G", "4": "A", "5": "B", "6": "G", "7": "A", "8": "D", "9": "A" },
-                5: { "1": "D", "2": "A", "3": "G", "4": "B", "5": "A", "6": "G", "7": "B", "8": "G", "9": "A" },
-                6: { "1": "G", "2": "B", "3": "D", "4": "A", "5": "B", "6": "D", "7": "A", "8": "D", "9": "B" },
-                7: { "1": "D", "2": "A", "3": "G", "4": "B", "5": "A", "6": "G", "7": "B", "8": "G", "9": "A" },
-                8: { "1": "G", "2": "A", "3": "D", "4": "A", "5": "A", "6": "D", "7": "A", "8": "G", "9": "B" },
-                9: { "1": "D", "2": "B", "3": "G", "4": "B", "5": "B", "6": "G", "7": "B", "8": "D", "9": "A" },
-                10: { "1": "G", "2": "A", "3": "D", "4": "A", "5": "A", "6": "D", "7": "A", "8": "G", "9": "B" },
-                11: { "1": "G", "2": "B", "3": "G", "4": "A", "5": "B", "6": "G", "7": "A", "8": "D", "9": "A" },
-                12: { "1": "D", "2": "A", "3": "D", "4": "B", "5": "A", "6": "D", "7": "B", "8": "G", "9": "B" }
-            };
-            const femaleLookup = {
-                1: { "1": "G", "2": "A", "3": "D", "4": "A", "5": "G", "6": "D", "7": "A", "8": "G", "9": "B" },
-                2: { "1": "D", "2": "B", "3": "G", "4": "B", "5": "D", "6": "G", "7": "B", "8": "D", "9": "A" },
-                3: { "1": "D", "2": "A", "3": "D", "4": "B", "5": "G", "6": "D", "7": "B", "8": "G", "9": "B" },
-                4: { "1": "G", "2": "B", "3": "G", "4": "A", "5": "D", "6": "G", "7": "A", "8": "D", "9": "A" },
-                5: { "1": "D", "2": "A", "3": "D", "4": "B", "5": "G", "6": "D", "7": "B", "8": "G", "9": "B" },
-                6: { "1": "G", "2": "B", "3": "D", "4": "A", "5": "D", "6": "D", "7": "A", "8": "D", "9": "B" },
-                7: { "1": "D", "2": "A", "3": "G", "4": "B", "5": "G", "6": "G", "7": "B", "8": "G", "9": "A" },
-                8: { "1": "G", "2": "B", "3": "D", "4": "A", "5": "D", "6": "D", "7": "A", "8": "D", "9": "B" },
-                9: { "1": "D", "2": "B", "3": "G", "4": "B", "5": "D", "6": "G", "7": "B", "8": "D", "9": "A" },
-                10: { "1": "G", "2": "A", "3": "D", "4": "A", "5": "G", "6": "D", "7": "A", "8": "G", "9": "B" },
-                11: { "1": "D", "2": "B", "3": "G", "4": "B", "5": "D", "6": "G", "7": "B", "8": "D", "9": "A" },
-                12: { "1": "D", "2": "A", "3": "D", "4": "B", "5": "G", "6": "D", "7": "B", "8": "G", "9": "B" }
-            };
 
-            const affinityMap = {
-                "D": "SS",
-                "B": "DS",
-                "A": "DD",
-                "G": "SD"
-            };
+                document.getElementById('reportOutput').innerHTML = reportContent;
 
-            let currentYear = year;
-            let monthRowIndex = getMonthRow(day, month, currentYear);
+                // --- DYNAMIC HIDING LOGIC FOR ROMANTIC RELATIONSHIPS ---
+                const currentReportType = `${affinityA.toLowerCase()}-${affinityB.toLowerCase()}`;
+                const allRomanticParagraphs = document.querySelectorAll(`#reportOutput [id^="romantic-"]`);
 
-            if (monthRowIndex === 12 && month === 1 && day <= 5) {
-                currentYear -= 1;
-            }
+                allRomanticParagraphs.forEach(paragraph => {
+                    // Hide all paragraphs initially
+                    paragraph.style.display = 'none';
 
-            const yearOrder = getYearOrder(currentYear);
+                    // Extract the gender combination and report type from the ID
+                    // Example ID: "romantic-male-female-dd-ds"
+                    const idParts = paragraph.id.split('-'); 
+                    if (idParts.length >= 5) { // Ensure enough parts for gender and affinity type
+                        const idGenderA = idParts[1];
+                        const idGenderB = idParts[2];
+                        const idReportType = `${idParts[3]}-${idParts[4]}`; // Reconstruct the report type from ID
 
-            if (yearOrder === -1) {
-                throw new Error("Year order could not be determined for the adjusted year.");
-            }
-
-            let letterCode;
-            if (gender === "male") {
-                letterCode = maleLookup[monthRowIndex][String(yearOrder)];
-            } else { // female
-                letterCode = femaleLookup[monthRowIndex][String(yearOrder)];
-            }
-
-            return affinityMap[letterCode] || "UNKNOWN_TYPE";
-        }
-
-        // --- Main Event Listener and Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const generateReportBtn = document.getElementById('generateReportBtn');
-            const resultDiv = document.getElementById('resultDiv');
-            const loadingMessage = document.getElementById('loadingMessage');
-            const downloadLink = document.getElementById('downloadReportLink');
-            const downloadButtonContainer = document.getElementById('downloadButtonContainer');
-
-            // Initial state: hide the download button container
-            downloadButtonContainer.style.display = 'none';
-
-            if (generateReportBtn) {
-                generateReportBtn.addEventListener('click', async () => {
-                    console.log('Generate button clicked.'); // DEBUG LOG
-
-                    const nameA = document.getElementById('nameA').value.trim();
-                    const dayA = parseInt(document.getElementById('dayA').value);
-                    const monthA = parseInt(document.getElementById('monthA').value);
-                    const yearA = parseInt(document.getElementById('yearA').value);
-                    const genderA = document.getElementById('genderA').value;
-
-                    const nameB = document.getElementById('nameB').value.trim();
-                    const dayB = parseInt(document.getElementById('dayB').value);
-                    const monthB = parseInt(document.getElementById('monthB').value);
-                    const yearB = parseInt(document.getElementById('yearB').value);
-                    const genderB = document.getElementById('genderB').value;
-
-                    resultDiv.innerHTML = '';
-                    downloadButtonContainer.style.display = 'none'; // Hide the container
-                    loadingMessage.classList.remove('hidden');
-                    console.log('UI state reset, loading message shown.'); // DEBUG LOG
-
-                    try {
-                        const affinityA = calculateNatalAffinityZone(dayA, monthA, yearA, genderA);
-                        const affinityB = calculateNatalAffinityZone(dayB, monthB, yearB, genderB);
-
-                        // Canonical sorting for the relationship key (e.g., "SS-SD" vs "SD-SS" becomes "SD-SS")
-                        const sortedAffinities = [affinityA, affinityB].sort();
-                        let relationshipKey = sortedAffinities.join('-');
-                        console.log('Calculated relationship key:', relationshipKey); // DEBUG LOG
-
-                        // --- Dynamic Polarity Description Logic ---
-                        let personAPolarityDesc = '';
-                        if (genderA === 'male') {
-                            personAPolarityDesc = `his inherent energetic expression aligns with the archetypal Yang. This means he likely experiences a natural ease in embodying traditional masculine roles—being a bold protector, a decisive provider, or a commanding leader. His drive and assertiveness probably feel effortless and fundamental to who he is. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. It's not out of malice, but simply because his natural impulse is so strong and direct. Perhaps you’ve had moments where his directness in a conversation came across as rude, when he simply meant to be efficient.`;
-                        } else if (genderA === 'female') {
-                            personAPolarityDesc = `her inherent energetic expression aligns with the archetypal Yang. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that her innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. She might find herself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge her self-esteem, making her question if she is "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely her unique gift, shaping her into a powerful and empowered woman. Think of a time she simply took charge of a situation, and someone reacted with surprise—that’s her natural energy in action.`;
+                        // Check if this paragraph matches the current input genders AND the current report type
+                        if (idGenderA === personAGender && idGenderB === personBGender && idReportType === currentReportType) {
+                            paragraph.style.display = 'block'; // Show the matching paragraph
                         }
-
-                        let personBPolarityDesc = '';
-                        if (genderB === 'male') {
-                            personBPolarityDesc = `his inherent energetic expression aligns with the archetypal Yang. This means he naturally embodies a straightforward masculine presence, often gravitating towards leadership, tangible results, or intellectual mastery. His drive and assertiveness probably feel effortless and fundamental to him. However, this powerful current, if not consciously tempered, can sometimes manifest as a tendency to be boastful, arrogant, or overly forceful. He might not even realize it, as his natural impulse is so strong and direct. You might find that his confidence, though a powerful asset, can sometimes be perceived by you as overbearing if he's not careful to modulate his intensity. Perhaps you’ve observed him being fiercely direct in a conversation, and while it gets results, it might leave others feeling steamrolled.`;
-                        } else if (genderB === 'female') {
-                            personBPolarityDesc = `her inherent energetic expression aligns with the archetypal Yang. While she is biologically female, her neurochemical blueprint predisposes her to powerful, active, and initiating Yang energy, making her a true force of nature. This might sometimes lead to a subtle inner conflict, or a feeling that her innate power doesn't quite fit conventional feminine ideals of softness, gentle nurturing, or quiet compliance. She might find herself more spirited, active, passionate, extroverted, or forthright than traditionally expected, embodying a commanding feminine presence that’s stronger than traditionally expected. This inherent divergence from societal molds can sometimes challenge her self-esteem, making her question if she is "too much" or not "feminine enough." Yet, this very strong, independent nature is precisely her unique gift, shaping her into a powerful and empowered woman. You might admire her ability to take charge effortlessly, or her fearless pursuit of ambitious goals.`;
-                        }
-                        // --- End Dynamic Polarity Description Logic ---
-
-                        // Fetch report content from the specific HTML file in the 'reports' folder
-                        const reportFilePath = `reports/${relationshipKey.toLowerCase()}.html`;
-                        console.log('Attempting to fetch report from:', reportFilePath); // DEBUG LOG
-                        const response = await fetch(reportFilePath);
-                        console.log('Fetch response status:', response.status); // DEBUG LOG
-                        console.log('Fetch response OK:', response.ok); // DEBUG LOG
-
-                        if (!response.ok) {
-                            console.error('Fetch was not OK. Response status:', response.status); // DEBUG LOG
-                            throw new Error(`Report content not found for ${relationshipKey} (Status: ${response.status}). Please ensure 'reports/${relationshipKey.toLowerCase()}.html' exists and is accessible.`);
-                        }
-
-                        let reportContent = await response.text();
-                        console.log('Fetched report content length:', reportContent.length); // DEBUG LOG
-                        console.log('Fetched report content (first 200 chars):', reportContent.substring(0, 200)); // DEBUG LOG
-                        
-                        if (reportContent.trim().length === 0 || reportContent.includes('<!DOCTYPE html>')) { // Check for empty or full HTML
-                            console.error('Report file content is empty or contains full HTML structure:', reportContent.substring(0, 50)); // DEBUG LOG
-                            throw new Error(`Report file for ${relationshipKey} is empty or contains unexpected full HTML structure. Ensure it only contains the report section.`);
-                        }
-
-                        // Replace placeholders for dynamic data within the fetched insight
-                        reportContent = reportContent
-                            .replace(/PERSON_A_GENDER/g, genderA)
-                            .replace(/PERSON_B_GENDER/g, genderB)
-                            .replace(/PERSON_A_NAME/g, nameA)
-                            .replace(/PERSON_B_NAME/g, nameB)
-                            .replace(/AFFINITY_A/g, affinityA)
-                            .replace(/AFFINITY_B/g, affinityB)
-                            .replace(/PERSON_A_POLARITY_DESC/g, personAPolarityDesc) // New replacement
-                            .replace(/PERSON_B_POLARITY_DESC/g, personBPolarityDesc); // New replacement
-                        console.log('General placeholders and polarity descriptions processed.'); // DEBUG LOG
-
-                        // --- Dynamic Romantic Context Replacement ---
-                        // This logic will remove the irrelevant romantic context paragraphs
-                        // based on the gender combination, leaving only the relevant one.
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = reportContent; // Parse the content as HTML
-
-                        // Get all potential romantic context paragraphs by their IDs
-                        const romanticMaleFemaleEl = tempDiv.querySelector('#romantic-male-female-dd-dd');
-                        const romanticFemaleMaleEl = tempDiv.querySelector('#romantic-female-male-dd-dd');
-                        const romanticMaleMaleEl = tempDiv.querySelector('#romantic-male-male-dd-dd');
-                        const romanticFemaleFemaleEl = tempDiv.querySelector('#romantic-female-female-dd-dd');
-
-                        // Remove all of them first
-                        if (romanticMaleFemaleEl) romanticMaleFemaleEl.remove();
-                        if (romanticFemaleMaleEl) romanticFemaleMaleEl.remove();
-                        if (romanticMaleMaleEl) romanticMaleMaleEl.remove();
-                        if (romanticFemaleFemaleEl) romanticFemaleFemaleEl.remove();
-
-                        // Now, create the specific paragraph content and insert it
-                        let specificRomanticParagraphHtml = '';
-                        if (genderA === 'male' && genderB === 'female') {
-                            specificRomanticParagraphHtml = `
-                                <p class="mb-2">If <b>${nameA}</b> is male and <b>${nameB}</b> is female: You, <b>${nameA}</b>, are likely drawn to <b>${nameB}</b>'s high charge and independence; you respect her strength and drive, finding her exciting and powerful rather than seeking a conventionally "softer" or more traditionally submissive partner. You value her as a strong, capable ally in life's challenges, not because she is like "Betty Crocker." Your shared confidence, <b>${nameA}</b>, though a powerful asset, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. For example, during a passionate discussion about a shared goal, your natural assertiveness might push for an immediate decision, and <b>${nameB}</b> might feel her innovative ideas are being cut short. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if you don't intend it, as your natural impulse is to lead and make things happen. This strong, independent nature in <b>${nameB}</b> is precisely her unique gift, shaping her into a powerful and empowered woman, and your respect for this drive, <b>${nameA}</b>, is a cornerstone of your mutual attraction. This combination can be incredibly formidable in the external world, capable of achieving immense impact. The challenge lies in consciously cultivating moments of vulnerability and stillness, to prevent your shared drive from overshadowing the tender needs of the heart. For instance, you might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.</p>
-                            `;
-                        } else if (genderA === 'female' && genderB === 'male') {
-                            specificRomanticParagraphHtml = `
-                                <p class="mb-2">If <b>${nameA}</b> is female and <b>${nameB}</b> is male: You, <b>${nameA}</b>, as a female Dynamic Initiator, embody a powerful, active, and initiating Yang energy, making you a true force of nature. You might find <b>${nameB}</b>'s strength and directness incredibly compelling, as he can keep pace with your ambition and drive. <b>${nameB}</b>, in turn, might admire your powerful will and decisive nature. The challenge for you both will be to bridge the gap between your shared assertive energies, ensuring that neither partner dominates the other. You might find that your own confidence, <b>${nameA}</b>, can sometimes be perceived by <b>${nameB}</b> as overbearing or demanding if you're not careful to modulate your intensity. <b>${nameB}</b>, in turn, may find your directness sometimes comes across as arrogant or rude, even if he doesn't intend it, as his natural impulse is to lead and make things happen. This pairing has the potential for immense achievement, but requires conscious effort to cultivate mutual yielding and emotional intimacy. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy.</p>
-                            `;
-                        } else if (genderA === 'male' && genderB === 'male') {
-                            specificRomanticParagraphHtml = `
-                                <p class="mb-2">If both <b>${nameA}</b> and <b>${nameB}</b> are male: As two male Dynamic Initiators, your relationship is a potent force of shared drive, ambition, and a mutual respect for competence. You both naturally gravitate towards leadership and achieving tangible results. This can lead to incredible productivity and external success. The challenge lies in managing your shared strong wills and competitive natures, ensuring that your drive for impact doesn't overshadow the need for emotional vulnerability and shared stillness. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.</p>
-                            `;
-                        } else if (genderA === 'female' && genderB === 'female') {
-                            specificRomanticParagraphHtml = `
-                                <p class="mb-2">If both <b>${nameA}</b> and <b>${nameB}</b> are female: As two female Dynamic Initiators, your relationship is a powerful and unconventional pairing, embodying immense drive and a fearless pursuit of ambitious goals. You both possess strong, active Yang energy, which can lead to remarkable achievements and a deep understanding of each other's independent natures. The challenge lies in navigating your shared assertive energies, ensuring that neither partner dominates the other, and consciously cultivating moments of vulnerability and stillness to nurture the emotional depth of your connection. You might find yourselves constantly pushing for new projects or social events, but neglecting quiet date nights or deep, vulnerable conversations about your inner worlds. The key is to consciously make space for that "Yin" energy and practice mutual yielding.</p>
-                            `;
-                        }
-
-                        // Find the "Romantic Relationships" heading and insert the relevant paragraph after it
-                        const allH4s = tempDiv.querySelectorAll('h4');
-                        let romanticHeading = null;
-                        for (const h4 of allH4s) {
-                            if (h4.textContent.includes('Romantic Relationships')) {
-                                romanticHeading = h4;
-                                break;
-                            }
-                        }
-
-                        if (romanticHeading && specificRomanticParagraphHtml) {
-                            const newParagraph = document.createElement('div'); // Use a div to hold the HTML content
-                            newParagraph.innerHTML = specificRomanticParagraphHtml;
-                            // Insert the new paragraph after the romantic heading
-                            romanticHeading.parentNode.insertBefore(newParagraph, romanticHeading.nextSibling);
-                        }
-                        
-                        processedReportContent = tempDiv.innerHTML; // Re-serialize the HTML after modifications
-                        console.log('Romantic context processed and inserted.'); // DEBUG LOG
-
-
-                        // The HTML to display in the resultDiv
-                        let finalReportHtmlForDisplay = `
-                            <p class="text-2xl font-semibold mb-6 text-center text-gray-900">
-                                The Sacred Connection Between ${nameA} (${affinityA}) and ${nameB} (${affinityB}):
-                                <br class="hidden md:block"> A Journey into their Unique ${affinityA}-${affinityB} Relationship
-                            </p>
-                            ${processedReportContent}
-                        `;
-                        resultDiv.innerHTML = finalReportHtmlForDisplay;
-                        console.log('resultDiv innerHTML set.'); // DEBUG LOG
-                        console.log('resultDiv clientHeight after content:', resultDiv.clientHeight); // DEBUG LOG
-                        
-                        downloadButtonContainer.style.display = 'block'; // Show the container
-                        console.log('Download button container shown.'); // DEBUG LOG
-                        console.log('Download link offsetWidth:', downloadLink.offsetWidth, 'offsetHeight:', downloadLink.offsetHeight); // DEBUG LOG
-
-                        // Set up download link functionality using a temporary anchor element
-                        downloadLink.onclick = (event) => { // Added event parameter
-                            event.preventDefault(); // Prevent default link behavior
-                            console.log('Download link clicked inside handler.'); // DEBUG LOG
-
-                            // Construct the full HTML for download separately
-                            const downloadReportBodyContent = `
-                                <h1 style="font-size: 2.2em; text-align: center; color: #1a202c; margin-bottom: 0.8em;">AZONE AI Relationship Report for ${nameA} and ${nameB}</h1>
-                                <p style="font-size: 1.8em; text-align: center; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em;">
-                                    The Sacred Connection Between ${nameA} (${affinityA}) and ${nameB} (${affinityB}):
-                                    <br> A Journey into their Unique ${affinityA}-${affinityB} Relationship
-                                </p>
-                                ${processedReportContent}
-                            `;
-                            console.log('Download HTML body content prepared.'); // DEBUG LOG
-
-                            const downloadHtml = `
-                                <!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>AZONE AI Relationship Report - ${nameA} & ${nameB}</title>
-                                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-                                    <style>
-                                        body { font-family: 'Inter', sans-serif; line-height: 1.8; color: #333; max-width: 850px; margin: 0 auto; padding: 25px; background-color: #f9fafb; }
-                                        h1 { font-size: 2.2em; text-align: center; color: #1a202c; margin-bottom: 0.8em; }
-                                        h2 { font-size: 1.8em; color: #2d3748; margin-top: 1.5em; margin-bottom: 0.7em; }
-                                        h3 { font-size: 1.5em; color: #2d3748; margin-top: 1.2em; margin-bottom: 0.6em; }
-                                        h4 { font-size: 1.25em; color: #4a5568; margin-top: 1em; margin-bottom: 0.5em; }
-                                        p { margin-bottom: 1em; }
-                                        ul { list-style-type: disc; margin-left: 25px; margin-bottom: 1em; }
-                                        li { margin-bottom: 0.5em; }
-                                        b, strong { font-weight: 600; color: #2c3e50; }
-                                        .report-section { border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5em; margin-bottom: 1.5em; }
-                                        .report-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
-                                    </style>
-                                </head>
-                                <body>
-                                    ${downloadReportBodyContent}
-                                </body>
-                                </html>
-                            `;
-                            console.log('Full download HTML prepared.'); // DEBUG LOG
-
-                            try {
-                                const blob = new Blob([downloadHtml], { type: 'text/html' });
-                                const tempUrl = URL.createObjectURL(blob);
-                                
-                                const tempLink = document.createElement('a');
-                                tempLink.href = tempUrl;
-                                tempLink.download = `AZONE_Report_${nameA}_${nameB}.html`;
-                                tempLink.style.display = 'none';
-                                document.body.appendChild(tempLink);
-                                tempLink.click();
-                                document.body.removeChild(tempLink);
-                                URL.revokeObjectURL(tempUrl);
-                                console.log('Download triggered successfully using temporary link.');
-                            } catch (downloadError) {
-                                console.error('Error during download process:', downloadError);
-                            }
-                        };
-
-                    } catch (error) {
-                        console.error('Error during report generation (caught):', error);
-                        resultDiv.innerHTML = `<p class="text-red-500 text-center">Error: ${error.message}</p>`;
-                        resultDiv.style.display = 'block';
-                    } finally {
-                        loadingMessage.classList.add('hidden');
-                        console.log('Loading message hidden.');
                     }
                 });
+                // --- END DYNAMIC HIDING LOGIC ---
+
+            } catch (error) {
+                console.error("Error loading report:", error);
+                document.getElementById('reportOutput').innerHTML = `<p class="text-red-500">Error loading report: ${error.message}. This usually means the report file (${reportPath}) is not found or the path is incorrect. Please ensure 'reports/${reportFileName}' exists in your GitHub repository's root folder and is correctly named (e.g., all lowercase for folder and file names).</p>`;
             }
-        });
+        }
+
+        // Initial report generation on load (optional, useful for testing)
+        window.onload = () => {
+             // Set default dates to ensure a DD-DS combination for initial load testing
+            document.getElementById('personADOB').value = '1990-02-01'; // Example for DD (even year)
+            document.getElementById('personBDOB').value = '1991-03-01'; // Example for DS (odd year)
+            generateReport();
+        };
     </script>
 </body>
 </html>
